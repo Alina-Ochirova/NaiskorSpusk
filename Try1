@@ -1,0 +1,49 @@
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt 
+from sympy import *
+x = symbols('x', integer=True)
+#Сама функция
+def Yx(x):
+    return (5 * x * x - 4 * x + 1 )
+#Производная функции(Возвращает численное значение)
+def Yxp(x,per):
+    return (diff(Yx(x),x).subs(x,per))
+  
+#Сам метод   
+def Naiskor(a, b, epsi):
+    x_a = a
+    x_b = b
+    while Yxp(x,x_a) < Yxp(x,(x_a - epsi*Yxp(x,x_a))):
+        x_a = x_a - epsi*Yxp(x,x_a)
+    return (x_a)
+    
+#Вручную вводим значение и выводим результат    
+a = float(input("Введите нижнее значение интервала - "))
+b = float(input("Введите верхнее значение интервала - "))
+epsi = float(input("Введите значение эпсилон - "))
+xMethod = Naiskor(a, b, epsi)
+yMethod = Yx(xMethod)
+print("Экстремум функции имеет координаты - (", xMethod, "; ", yMethod, ")")
+
+
+#Сама таблица...
+dfError = pd.DataFrame({
+    "ε": pd.Series(dtype='float64'),
+    "Координата Х": pd.Series(dtype='float64'),
+    "Координата У": pd.Series(dtype='float64'),
+})
+epsi = Matrix([[0.3, 0.2, 0.1, 0.05, 0.001]])
+x = zeros(1,5)
+y = zeros(1,5)
+for i in range(len(epsi)):
+    x[i] = Naiskor(a, b, epsi[i])
+    y[i] = Yx(x[i])
+dfCompare = pd.DataFrame({
+    "ε": pd.Series(epsi),
+    "Координата Х": pd.Series(x),
+    "Координата У": pd.Series(y),
+})
+dfCompare
+
+
